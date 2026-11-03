@@ -124,7 +124,7 @@ Each row is one training run of 100,000 games, followed by evaluation on 3,000 g
 
 **Average bounces on a large test set.** The tuned configuration averaged **18.01 bounces per game** over 3,000 greedy test games (standard error 0.23), with a median of 15. That is above the assignment's 12 to 14 target.
 
-**Noise.** Running the baseline with three seeds gave 17.12, 16.97, and 16.68. Differences smaller than about 0.5 bounces should therefore be treated as noise. The C = 200 result was checked on two seeds (17.96 on seed 42, 17.23 on seed 1, against 16.97 for the baseline on seed 1), which supports it being a real improvement. The tuned configuration was run with one seed only.
+**Noise.** Running the baseline with three seeds gave 17.12, 16.97, and 16.68. Differences smaller than about 0.5 bounces should therefore be treated as noise. The C = 200 result was checked on two seeds (17.96 on seed 42, 17.23 on seed 1, against 16.97 for the baseline on seed 1), which supports it being a real improvement. The tuned configuration was run with one seed only. A rerun of the tuned configuration in a fresh environment gave 18.15 ± 0.24, close to the logged 18.01 and consistent with it. The episodes-to-9 count differed slightly (29,258 versus 28,841), which is likely due to numpy version differences in the sandbox.
 
 **Convergence.** Across these runs, the agent reached a 9-bounce average between roughly 14,000 and 48,000 training games, and a 12-bounce average between roughly 17,000 and 56,000 games. The choice of decay rate has the largest effect on speed.
 
@@ -132,19 +132,36 @@ Each row is one training run of 100,000 games, followed by evaluation on 3,000 g
 
 ## Changes to the MDP
 
-> **TODO (Part C):** Not yet run. Fill in the following:
->
-> - **What was changed.** Describe each change to the discretization (for example, grid resolution, velocity bins) or the reward model, and the constants involved.
-> - **Why.** The reasoning behind each change.
-> - **Effect on training.** How the change affected the number of states, the number of games needed to converge, and training time.
+**What was changed.** The only modification tested so far is the resolution of the ball-position grid. `gridSize` was reduced from 12 to 8, so the board is split into an 8 × 8 grid of ball-position cells instead of 12 × 12. Everything else is unchanged: 12 paddle bins, 2 horizontal-velocity bins, 3 vertical-velocity bins, and the same velocity threshold of 0.015. The number of states drops from 10,369 to 8 × 8 × 2 × 3 × 12 + 1 = **4,609**. The training configuration is the tuned one (C = 200, decay = 0.9999).
+
+**Why.** With fewer states, each state is visited more often, so its Q-values should settle sooner. The cost is precision: two ball positions in the same cell are now treated as identical. Each cell is now 0.125 wide instead of about 0.083, so the agent can no longer tell apart nearby ball positions that may call for different paddle moves. The expected result was faster convergence with a lower ceiling.
+
+**Effect on training.** The state count fell by about 56%. Episodes to reach 9 bounces were 28,361 (versus 29,258 for the tuned configuration rerun in the same environment), and episodes to reach 12 bounces were 34,444 (versus 33,271). So in this run the smaller state space did not noticeably speed up convergence. Training took 845 seconds, compared with 1,004 seconds for the rerun. Timings were not gathered under controlled conditions, so this difference should not be relied on.
+
+Other modifications considered (a 16 × 16 grid, changing the number of paddle bins, dropping the horizontal-velocity bin, and using five vertical-velocity bins) have not been run yet.
 
 ## Observations for the New MDP
 
-> **TODO (Part C):** Record what changed in behaviour, including anything unexpected.
+- **Lower ceiling.** The grid-8 configuration averaged 14.20 ± 0.20 bounces, against 18.15 ± 0.24 for the tuned configuration rerun under the same protocol. The gap of about 4 bounces is far larger than the seed-to-seed noise measured for the baseline (about 0.5), so the coarser grid looks like a real loss of performance on this metric, not a fluctuation.
+- **Plateau instead of continued growth.** The trailing 5,000-game average sat between 13.9 and 14.1 from about episode 55,000 through 100,000, so the agent had stopped improving well before the end of training.
+- **Lower median and spread.** The median fell from 15 to 11, and the standard deviation was 10.94, compared with 13.22 for the tuned rerun. This suggests that the agent loses more games early on, not only that it misses more often in long rallies.
+- **No stuck games.** No test game hit the 5,000-step cap, so the lower score is not caused by the agent getting stuck.
+- **The "fewer states, faster learning" prediction did not hold** in this run. See the effect on training above.
+
+All of these come from one training seed for the grid-8 configuration, so they should be treated as provisional until repeated.
 
 ## New Average Bounces
 
-> **TODO (Part C):** Report the average bounces over at least 1,000 greedy test games for the converged modified configuration, with standard error, and compare it to the baseline (17.12 ± 0.23 on 3,000 games; tuned 18.01 ± 0.23).
+Greedy evaluation of the grid-8 configuration over 3,000 test games (test seed `randomSeed + 1`, the same protocol as the earlier runs) gave **14.20 ± 0.20** bounces, with a median of 11 and a standard deviation of 10.94. For comparison:
+
+| Configuration | Avg bounces (± stderr) | Median |
+|---|---|---|
+| Baseline (seed 42) | 17.12 ± 0.23 | 14 |
+| Tuned, logged (C = 200, decay = 0.9999) | 18.01 ± 0.23 | 15 |
+| Tuned, rerun in sandbox | 18.15 ± 0.24 | 15 |
+| Grid 8 (4,609 states), tuned otherwise | 14.20 ± 0.20 | 11 |
+
+The grid-8 score is at the top of the assignment's 12 to 14 "strong" range, but it is clearly below the tuned 10,369-state configuration. On this evidence, reducing the grid resolution is not an improvement.
 
 ## How to Run
 
