@@ -10,7 +10,7 @@ The goals of this project are to:
 2. Implement tabular Q-learning with an exploration strategy to train an agent on that MDP.
 3. Evaluate the trained agent on a large number of test games, and measure how the MDP and hyperparameter choices affect performance.
 
-The target from the assignment is at least 9 consecutive rebounds on average, with 12 to 14 being a strong result.
+The target is at least 9 consecutive rebounds on average, with 12 to 14 being a strong result.
 
 ## Files
 
