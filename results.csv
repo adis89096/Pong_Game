@@ -1,0 +1,12 @@
+name,settings,eval_mean,eval_stderr,episodes_to_9,episodes_to_12,train_seconds,eval_median,eval_std,hit_cap
+baseline,{'seed': 42},17.12,0.23,39646,49544,825,14,12.45,0
+baseline_seed1,{'seed': 1},16.97,0.22,38622,50330,830,14,12.03,0
+baseline_seed2,{'seed': 2},16.68,0.21,40475,49937,910,14,11.76,0
+c10,"{'learningRate': 10.0, 'seed': 42}",16.81,0.23,35556,49155,903,14,12.45,1
+c200,"{'learningRate': 200.0, 'seed': 42}",17.96,0.24,48038,56035,1027,14,13.11,2
+gamma90,"{'discountFactor': 0.9, 'seed': 42}",15.7,0.21,41878,54287,934,13,11.28,0
+gamma99,"{'discountFactor': 0.99, 'seed': 42}",16.7,0.22,35696,46018,985,14,11.79,1
+decay9999,"{'epsilonDecay': 0.9999, 'seed': 42}",17.43,0.23,23484,28276,1026,14,12.74,0
+c200_seed1,"{'learningRate': 200.0, 'seed': 1}",17.23,0.23,47292,56446,851,14,12.71,0
+decay9998,"{'epsilonDecay': 0.9998, 'seed': 42}",17.77,0.24,14470,16752,1229,14,12.95,1
+tuned,"{'learningRate': 200.0, 'epsilonDecay': 0.9999, 'seed': 42}",18.01,0.23,28841,33520,988,15,12.84,1
